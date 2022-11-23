@@ -1,7 +1,8 @@
 from asyncio import tasks
 import datetime
-import discord
+import telegramMain
 from discord.ext import commands
+import asyncio 
 
 
 bot = commands.Bot("!")    
@@ -47,5 +48,5 @@ async def current_time():
     channel = bot.get_channel(1022289024737607783)
     await channel.send("Data atual: " + now)
 
-bot.run("MTAyMjI4NzI2NDY2NTA0MzA5NQ.GH2-cY.DADrghqrxXe7sOK8YzpgW9me7q4K_M1bswdhZI")
+bot.run("MTAyMjI4NzI2NDY2NTA0MzA5NQ.GFXMJt.DZjpD4LaJ80UOCPdg_PyZBQaVGPX7nlUHGJBGU")
     
