@@ -1,55 +1,49 @@
+import json
 import logging
-from telegram import Bot, Update
-from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes, MessageHandler, CallbackContext
-
+from typing import Self
+from telegram import*
+from telegram.ext import*
+import responses as R
 
 async def hello(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text(f'Hello {update.effective_user.first_name}')
 
 
 async def estimativa(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    await update.message.reply_text(f'Vamos fazer uma estimativa sobre investimentos de acondo com as informações dadas, para isso digite /caucular')
+    await update.message.reply_text(f'Vamos fazer uma estimativa sobre investimentos de acondo com as informações dadas, para isso digite /setcommands')
 
 
-async def calcular(self, update_result, lastMsg=False):
-        update = self.getCurrentUpdate(update_result)
-        if self.previous_update_id != self.current_update_id:
-            _message_obj = self.getMessage(update)
-            _message_obj.m_from = self.getUser(update)
-            self.getInitialTime(_message_obj)
-            data = {self.current_update_id: _message_obj}
-            del _message_obj
+def tempInvest(bot, update):
+  bot.message.reply_text(main_menu_message(),
+                         reply_markup=main_menu_keyboard())
 
-            if lastMsg:
-                self.datas = {}     
+def main_menu(bot, update):
+    bot.callback_query.message.edit_text(main_menu_message(),
+                          reply_markup=main_menu_keyboard())
 
-            self.datas.update(data)
+def main_menu_keyboard():
+    keyboard = [[InlineKeyboardButton('Por seis meses', callback_data='seisMeses')],
+              [InlineKeyboardButton('Menu 2', callback_data='m2')],
+              [InlineKeyboardButton('Menu 3', callback_data='m3')]]
+    return InlineKeyboardMarkup(keyboard)
+
+def main_menu_message():
+  return 'Escolha o tempo determinada'
         
-        await update.message.reply_text(f'Hello {lastMsg}')
-        return
+def seisMeses(update, context, input_text):
+    return Self.filters.check_update(update) 
+    update.message.reply_text(f'Simule um valor a investir todo mês: ')
+    user_message = str(input_text).lower()
+    text = update.Message.Text
+    valorEstimado = ((user_message *1,16) + user_message) * 1,16
+    update.message.reply_text(f'Valor em seis meses: f{valorEstimado}')
 
-async def gerar(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    await update.message.reply_text(f'Digite o perído que você deseja recolher o dinheiro')
-    @Bot.message_handler(func=lambda message: True)
-    def echo_message(message):
-        cid = message.chat.id
-        mid = message.message_id 
-        message_text = message.text 
-        user_id = message.from_user.id 
-        user_name = message.from_user.first_name 
-        periodo = message.text
-    
-async def lucro(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    await update.message.reply_text(f'Digite o lucro desejavo:')
-    @Bot.message_handler(func=lambda message: True)
-    def echo_message(message):
-        cid = message.chat.id
-        mid = message.message_id 
-        message_text = message.text 
-        user_id = message.from_user.id 
-        user_name = message.from_user.first_name 
-        lucro = message.text
- 
+def handle_message(update, context):
+    text = str(update.message.text).lower()
+    response = R.sample_responses(text)
+    update.message.reply_text(response)
+
+
 
 
 
@@ -58,9 +52,14 @@ app = ApplicationBuilder().token("").build()
 
 app.add_handler(CommandHandler("hello", hello))
 app.add_handler(CommandHandler("estimativa", estimativa))
+app.dispatcher.add_handler(CommandHandler('tempInvest', tempInvest))
+app.dispatcher.add_handler(CallbackQueryHandler(main_menu, pattern='main'))
+app.add_handler(CommandHandler("seisMeses", seisMeses))
 
-app.run_polling()
+app.add_handler(MessageHandler(filters.Text, handle_message, Update))
+
+app.run_polling(120)
 
 
 
-
+ 
