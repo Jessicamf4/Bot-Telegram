@@ -1,3 +1,5 @@
+
+
 async def setcommands(update_result, update, selfult):
     await update.message.reply_text(f'Por quanto tempo quer investir?')
     {
